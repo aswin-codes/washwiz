@@ -8,6 +8,7 @@ import SignupPage from './screens/SignUp/SignUpScreen.jsx'
 import LaundrySearch from './screens/HomeScreen/HomeScreen.jsx'
 import HomeScreen from './screens/HomeScreen/HomeScreen.jsx'
 import LaundryDetails from './screens/LaundryScreen/LaundryScreen.jsx'
+import LaundryAdmin from './screens/HomeScreen/LaundryAdmin.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path='/' element={<HomeScreen/>}/>
         <Route path='/:name' element={<LaundryDetails/>}/>
         <Route path='/laundry' element={<LaundryDetails/>}/>
+        <Route path='/admin' element={<LaundryAdmin/>}/>
       </Routes>
    </BrowserRouter>    
   </React.StrictMode>,
