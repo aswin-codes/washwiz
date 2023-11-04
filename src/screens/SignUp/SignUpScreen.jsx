@@ -7,7 +7,7 @@ function SignupPage() {
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phonenumber, setphonenumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -16,7 +16,7 @@ function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  const phoneRegex = /^\d{10}$/;
+  const phonenumberRegex = /^\d{10}$/;
   const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
   const handleUsernameChange = (e) => {
@@ -27,8 +27,8 @@ function SignupPage() {
     setEmail(e.target.value);
   };
 
-  const handlePhoneChange = (e) => {
-    setPhone(e.target.value);
+  const handlephonenumberChange = (e) => {
+    setphonenumber(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -59,8 +59,8 @@ function SignupPage() {
       validationErrors.email = "Invalid email address";
     }
 
-    if (!phoneRegex.test(phone)) {
-      validationErrors.phone = "Invalid phone number (10 digits)";
+    if (!phonenumberRegex.test(phonenumber)) {
+      validationErrors.phonenumber = "Invalid phonenumber number (10 digits)";
     }
 
     if (!passwordRegex.test(password)) {
@@ -75,12 +75,50 @@ function SignupPage() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      // Handle signup logic here, e.g., sending data to your server
-      console.log("Username:", username);
-      console.log("Email:", email);
-      console.log("Phone:", phone);
-      console.log("Password:", password);
-      console.log("Confirm Password:", confirmPassword);
+      // Prepare user data to send to the server
+      const userData = {
+        username,
+        email,
+        phonenumber,
+        password,
+      };
+
+      // Send a POST request to the backend for user registration
+      fetch("http://localhost:3000/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      })
+        .then((response) => {
+          if (response.status === 201) {
+            // Registration successful
+            response.json().then((data) => {
+              // Store user data in local storage
+              localStorage.setItem("isLoggedIn", true);
+              localStorage.setItem("user_id", data.user_id);
+              localStorage.setItem("username", data.username);
+              localStorage.setItem("email", data.email);
+              localStorage.setItem("phonenumber", data.phonenumber);
+      
+              // Redirect to the login page or perform other actions
+              navigate('/');
+              console.log("Registration successful");
+            });
+          } else if (response.status === 400) {
+            // Registration failed due to validation errors
+            response.json().then((data) => {
+              setErrors(data);
+            });
+          } else {
+            // Handle other server errors
+            console.log("Error during registration");
+          }
+        })
+        .catch((error) => {
+          console.error("Error during registration:", error);
+        });
     }
   };
 
@@ -136,23 +174,23 @@ function SignupPage() {
             </div>
             <div className="mb-4">
               <label
-                htmlFor="phone"
+                htmlFor="phonenumber"
                 className="block text-gray-800 font-semibold"
               >
                 Phone Number (10 digits):
               </label>
               <input
                 type="text"
-                id="phone"
+                id="phonenumber"
                 className={`w-full p-2 border rounded ${
-                  errors.phone ? "border-red-500" : ""
+                  errors.phonenumber ? "border-red-500" : ""
                 }`}
-                placeholder="Your Phone Number"
-                value={phone}
-                onChange={handlePhoneChange}
+                placeholder="Your phonenumber Number"
+                value={phonenumber}
+                onChange={handlephonenumberChange}
               />
-              {errors.phone && (
-                <p className="text-red-500 text-sm">{errors.phone}</p>
+              {errors.phonenumber && (
+                <p className="text-red-500 text-sm">{errors.phonenumber}</p>
               )}
             </div>
             <div className="mb-4">
@@ -227,7 +265,10 @@ function SignupPage() {
               Create Account
             </button>
           </form>
-          <h1 onClick={() => navigate("/login")} className="text-center text-sm mt-5 ">
+          <h1
+            onClick={() => navigate("/login")}
+            className="text-center text-sm mt-5 "
+          >
             Already have an Account ? <span className="font-bold">Login</span>
           </h1>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Eye, EyeOff } from 'react-feather'; // Import the icons
+import { Eye, EyeOff } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 
 function LoginScreen() {
@@ -23,10 +23,44 @@ function LoginScreen() {
     passwordInputRef.current.type = showPassword ? 'password' : 'text';
   };
 
-  const handleRegistration = () => {
-    // Handle the registration logic here, e.g., sending data to your server
-    console.log('Email:', email);
-    console.log('Password:', password);
+  const handleLogin = () => {
+    // Create an object with the user's login data
+    const userData = {
+      email,
+      password,
+    };
+
+    // Send a POST request to the backend for user login
+    fetch("http://localhost:3000/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          // Login successful
+          response.json().then((data) => {
+            // Store user data in local storage
+            localStorage.setItem("isLoggedIn", true);
+            localStorage.setItem("user_id", data.user.user_id);
+            localStorage.setItem("username", data.user.username);
+            localStorage.setItem("email", data.user.email);
+            localStorage.setItem("phonenumber", data.user.phonenumber);
+
+            // Redirect to the home page or perform other actions
+            navigate('/');
+            console.log("Login successful");
+          });
+        } else if (response.status === 401) {
+          // Login failed due to invalid email or password
+          console.log("Invalid email or password");
+        } else {
+          // Handle other server errors
+          console.log("Error during login");
+        }
+      });
   };
 
   return (
@@ -70,7 +104,7 @@ function LoginScreen() {
             <button
               type="button"
               className="w-full bg-gray-700 text-white p-2 rounded hover:bg-gray-800"
-              onClick={handleRegistration}
+              onClick={handleLogin}
             >
               Login
             </button>

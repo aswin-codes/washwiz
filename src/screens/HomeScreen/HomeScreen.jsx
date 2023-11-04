@@ -1,54 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MapPin, Search, Frown } from "react-feather";
 import { useNavigate } from "react-router-dom";
 
-const mockLaundries = [
-  {
-    id: 1,
-    name: "CleanClothes Laundry",
-    location: "123 Main Street, Cityville, USA",
-    rating: 4.5,
-    image: "https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 2,
-    name: "FreshCleaners",
-    location: "456 Elm Street, Townsville, USA",
-    rating: 4.0,
-    image: "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&q=80&w=2071&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 3,
-    name: "LaundryMart",
-    location: "789 Oak Street, Villagetown, USA",
-    rating: 4.2,
-    image: "https://images.unsplash.com/photo-1635274605638-d44babc08a4f?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 4,
-    name: "SparklingSuds",
-    location: "101 Pine Street, Hamletville, USA",
-    rating: 4.3,
-    image: "https://images.unsplash.com/photo-1610305401607-8745a10c75dd?auto=format&fit=crop&q=80&w=1887&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 5,
-    name: "BrightLaundry",
-    location: "222 Cedar Street, Riverside, USA",
-    rating: 4.7,
-    image: "https://images.unsplash.com/photo-1638949493140-edb10b7be2f3?auto=format&fit=crop&q=80&w=1944&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-];
-
 function HomeScreen() {
   const navigate = useNavigate();
-  const [filteredLaundries, setFilteredLaundries] = useState(mockLaundries);
+  const [filteredLaundries, setFilteredLaundries] = useState([]);
 
+  const handleNavigate = () => {
+    
+    if (localStorage.getItem('isLoggedIn') == 'true'){
+      console.log("Hi")
+    } else {
+      navigate('/login');
+    }
+  }
+
+  useEffect(() => {
+    handleNavigate();
+    // Fetch the list of laundries with ratings from the backend
+    fetch("http://localhost:3000/laundries") // Replace with your actual backend endpoint
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Error fetching laundries with ratings");
+        }
+      })
+      .then((data) => {
+        setFilteredLaundries(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+ 
+
+  const handleLogout = () => {
+    localStorage.clear();
+    localStorage.setItem("isLoggedIn", false);
+    navigate('/login');
+  };
   const handleSearch = (e) => {
     const query = e.target.value;
-    const filtered = mockLaundries.filter((laundry) => {
+    const filtered = filteredLaundries.filter((laundry) => {
       return (
-        laundry.name.toLowerCase().includes(query) ||
+        laundry.title.toLowerCase().includes(query) ||
         laundry.location.toLowerCase().includes(query)
       );
     });
@@ -62,17 +59,31 @@ function HomeScreen() {
           <div className="flex flex-col items-start sm:flex-row w-full sm:items-center justify-between">
             <span className="mr-4">Wash Wiz</span>
             <div className="flex gap-4">
-            <div className="items-center hidden sm:flex bg-white p-2 rounded-lg">
-              <Search className="text-gray-700" size={18} />
-              <input
-                type="text"
-                placeholder="Search for laundries"
-                onChange={handleSearch}
-                className="sm:w-64 w-48 text-black sm:text-md text-sm ml-2 bg-transparent font-normal focus:outline-none"
-              />
+              <div className="items-center hidden sm:flex bg-white p-2 rounded-lg">
+                <Search className="text-gray-700" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search for laundries"
+                  onChange={handleSearch}
+                  className="sm:w-64 w-48 text-black sm:text-md text-sm ml-2 bg-transparent font-normal focus:outline-none"
+                />
+              </div>
+              {localStorage.getItem("isLoggedIn") ? (
+                <button
+                  onClick={() => handleLogout()}
+                  className="bg-blue-600 py-1 px-8 font-semibold text-sm rounded-lg"
+                >
+                  Logout
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="bg-blue-600 py-1 px-8 font-semibold text-sm rounded-lg"
+                >
+                  Login
+                </button>
+              )}
             </div>
-            <button onClick={() => navigate('/login')} className="bg-blue-600 py-1 px-8 font-semibold text-sm rounded-lg">Login</button>
-          </div>
           </div>
         </div>
       </header>
@@ -106,22 +117,22 @@ function HomeScreen() {
                 className="bg-white p-4 rounded-lg shadow-md"
               >
                 <img
-                  src={laundry.image}
+                  src={laundry.image_path}
                   alt={laundry.name}
                   className="w-full h-40 object-cover rounded-md mb-2"
                 />
-                <h2 className="text-lg font-semibold">{laundry.name}</h2>
+                <h2 className="text-lg font-semibold">{laundry.title}</h2>
                 <div className="flex items-center mb-2">
                   <MapPin className="text-gray-600" size={16} />
                   <p className="text-gray-600 ml-2">{laundry.location}</p>
                 </div>
                 <div className="flex items-center mb-2">
                   <span className="text-yellow-500">★</span>
-                  <span className="ml-2">{laundry.rating}</span>
+                  <span className="ml-2">{laundry.average_rating}</span>
                 </div>
                 <button
                   onClick={() =>
-                    navigate(`/${laundry.name}`, { state: { id: laundry.id } })
+                    navigate(`/${laundry.title}`, { state: { id: laundry.id } })
                   }
                   className="bg-gray-700 w-full text-white p-2 rounded hover:bg-gray-800"
                 >
