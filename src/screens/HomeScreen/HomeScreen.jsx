@@ -18,7 +18,7 @@ function HomeScreen() {
   useEffect(() => {
     handleNavigate();
     // Fetch the list of laundries with ratings from the backend
-    fetch("http://localhost:3000/laundries") // Replace with your actual backend endpoint
+    fetch("https://wazhine-backend.vercel.app/laundries") // Replace with your actual backend endpoint
       .then((response) => {
         if (response.ok) {
           return response.json();

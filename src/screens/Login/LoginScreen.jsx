@@ -31,7 +31,7 @@ function LoginScreen() {
     };
 
     // Send a POST request to the backend for user login
-    fetch("http://localhost:3000/auth/login", {
+    fetch("https://wazhine-backend.vercel.app/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

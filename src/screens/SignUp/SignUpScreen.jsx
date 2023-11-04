@@ -84,7 +84,7 @@ function SignupPage() {
       };
 
       // Send a POST request to the backend for user registration
-      fetch("http://localhost:3000/auth/signup", {
+      fetch("https://wazhine-backend.vercel.app/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -9,7 +9,7 @@ function LaundryList() {
     // Function to fetch laundry data
     const fetchLaundryData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/order/getorders/1');
+        const response = await fetch('https://wazhine-backend.vercel.app/order/getorders/1');
         if (response.ok) {
           const data = await response.json();
           setLaundryData(data);
@@ -44,7 +44,7 @@ function LaundryList() {
     const newStatus = event.target.value;
 
     try {
-      const response = await fetch(`http://localhost:3000/order/${laundry.order_id}`, {
+      const response = await fetch(`https://wazhine-backend.vercel.app/order/${laundry.order_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -71,7 +71,7 @@ function LaundryList() {
 
   const handleDelete = async (laundry) => {
     try {
-      const response = await fetch(`http://localhost:3000/order/${laundry.order_id}`, {
+      const response = await fetch(`https://wazhine-backend.vercel.app/order/${laundry.order_id}`, {
         method: "DELETE",
       });
 
@@ -94,7 +94,7 @@ function LaundryList() {
   };
 
   const handleMail = (email) => {
-    fetch(`http://localhost:3000/order/sendmail/${email}`).then(json => json.data).then(
+    fetch(`https://wazhine-backend.vercel.app/order/sendmail/${email}`).then(json => json.data).then(
       alert('Mail sent')
     )
   }

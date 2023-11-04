@@ -55,7 +55,7 @@ const LaundryDialog = ({ isOpen, onClose, shop_id,onAddLaundry }) => {
     };
   
     try {
-      const response = await fetch('http://localhost:3000/order/addorder/user', {
+      const response = await fetch('https://wazhine-backend.vercel.app/order/addorder/user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

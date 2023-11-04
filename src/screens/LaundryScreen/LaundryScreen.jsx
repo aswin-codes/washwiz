@@ -40,7 +40,7 @@ function LaundryDetails() {
   useEffect(() => {
     
     // Make a GET request to your backend to fetch laundry details
-    fetch(`http://localhost:3000/laundries/laundry/${shop_id}`)
+    fetch(`https://wazhine-backend.vercel.app/laundries/laundry/${shop_id}`)
       .then((response) => response.json())
       .then((data) => {
         console.log("J");
@@ -54,7 +54,7 @@ function LaundryDetails() {
   }, [shop_id]);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/order/user/${localStorage.getItem('user_id')}`)
+    fetch(`https://wazhine-backend.vercel.app/order/user/${localStorage.getItem('user_id')}`)
       .then((response) => response.json())
       .then((data) => {
         setOrders(data);
@@ -67,7 +67,7 @@ function LaundryDetails() {
   // Function to post a review
   const postReview = () => {
     if (newReview.trim() !== "" && newRating > 0) {
-      fetch(`http://localhost:3000/reviews/reviews`, {
+      fetch(`https://wazhine-backend.vercel.app/reviews/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -52,7 +52,7 @@ const LaundryDialog = () => {
       username,
     };
 
-    fetch("http://localhost:3000/order/addorder", {
+    fetch("https://wazhine-backend.vercel.app/order/addorder", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
