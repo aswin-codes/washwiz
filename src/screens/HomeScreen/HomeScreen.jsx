@@ -128,7 +128,7 @@ function HomeScreen() {
                 </div>
                 <div className="flex items-center mb-2">
                   <span className="text-yellow-500">★</span>
-                  <span className="ml-2">{laundry.average_rating}</span>
+                  <span className="ml-2">{parseInt(laundry.average_rating)}</span>
                 </div>
                 <button
                   onClick={() =>

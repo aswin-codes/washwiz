@@ -180,7 +180,7 @@ function LaundryDetails() {
                 </div>
                 <div className="flex items-center mb-2">
                   <span className="text-yellow-500">★</span>
-                  <span className="ml-2">{laundry.averageRating}</span>
+                  <span className="ml-2">{parseInt(laundry.averageRating)}</span>
                 </div>
                 <h3 className="text-xl font-semibold mt-4 mb-2">
                   Customer Reviews
