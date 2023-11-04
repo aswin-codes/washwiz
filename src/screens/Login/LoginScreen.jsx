@@ -48,6 +48,7 @@ function LoginScreen() {
             localStorage.setItem("username", data.user.username);
             localStorage.setItem("email", data.user.email);
             localStorage.setItem("phonenumber", data.user.phonenumber);
+            localStorage.setItem("type",data.user.type);
 
             // Redirect to the home page or perform other actions
             navigate('/');

@@ -1,120 +1,89 @@
 import React, { useState, useEffect } from "react";
 
 function LaundryList() {
-  const [laundryData, setLaundryData] = useState([
-    {
-      id: 1,
-      status: "REQUESTED",
-      userName: "John Doe",
-      email: "john@example.com",
-      orderId: "ORD123",
-      clothes: [
-        { name: "T-shirt", type: "washing", count: 2 },
-        { name: "Shirt", type: "washing+clothing", count: 3 },
-      ],
-      totalCost: 123,
-    },
-    {
-      id: 2,
-      status: "TAKEN",
-      userName: "Alice Smith",
-      email: "alice@example.com",
-      orderId: "ORD124",
-      clothes: [
-        { name: "Pant", type: "washing", count: 1 },
-        { name: "Sweater", type: "washing+drying", count: 2 },
-      ],
-      totalCost: 123,
-    },
-    {
-      id: 3,
-      status: "PROCESS",
-      userName: "Alice Smith",
-      email: "alice@example.com",
-      orderId: "ORD124",
-      clothes: [
-        { name: "Pant", type: "washing", count: 1 },
-        { name: "Sweater", type: "washing+drying", count: 2 },
-      ],
-      totalCost: 123,
-    },
-    {
-      id: 4,
-      status: "DONE",
-      userName: "Alice Smith",
-      email: "alice@example.com",
-      orderId: "ORD124",
-      clothes: [
-        { name: "Pant", type: "washing", count: 1 },
-        { name: "Sweater", type: "washing+drying", count: 2 },
-      ],
-      totalCost: 123,
-    },
-  ]);
+  const [laundryData, setLaundryData] = useState([]);
   const [myData, setMyData] = useState([]);
   const [openAccordion, setOpenAccordion] = useState({});
+
+  useEffect(() => {
+    // Function to fetch laundry data
+    const fetchLaundryData = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/order/getorders/1');
+        if (response.ok) {
+          const data = await response.json();
+          setLaundryData(data);
+          setMyData(data);
+        } else {
+          console.error('Error fetching data:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    // Call the function to fetch laundry data
+    fetchLaundryData();
+  }, []);
 
   useEffect(() => {
     setMyData(laundryData);
   }, [laundryData]);
 
   const handleSearch = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+
     const filteredData = laundryData.filter((laundry) =>
-      laundry.userName.toLowerCase().includes(e.target.value.toLowerCase())
+      laundry.username.toLowerCase().includes(searchTerm)
     );
+
     setMyData(filteredData);
   };
 
   const handleStatusChange = async (event, laundry) => {
     const newStatus = event.target.value;
 
-    console.log({
-      id: laundry.id,
-      status: newStatus,
-      userName: laundry.userName,
-      email: laundry.email,
-      orderId: laundry.orderId,
-      clothes: laundry.clothes,
-    });
-
-    // Continue with your update logic (uncomment when you have a backend)
-    /*
     try {
-      const response = await fetch(`http://localhost:3000/laundry/${laundry.id}`, {
+      const response = await fetch(`http://localhost:3000/order/${laundry.order_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          status: newStatus,
-          userName: laundry.userName,
-          email: laundry.email,
-          orderId: laundry.orderId,
-          clothes: laundry.clothes,
+          newStatus: newStatus,
         }),
       });
 
       if (response.ok) {
-        // Refresh the laundry data after a successful update
-        fetchLaundryData();
+        // Update the status in the frontend state
+        const updatedData = myData.map((item) =>
+          item.order_id === laundry.order_id ? { ...item, status: newStatus } : item
+        );
+
+        setMyData(updatedData);
       } else {
         console.error("Failed to update status:", response.status);
       }
     } catch (error) {
       console.error("Error updating status:", error);
     }
-    */
   };
 
   const handleDelete = async (laundry) => {
-    setLaundryData(laundryData.filter((item) => item.id !== laundry.id));
+    try {
+      const response = await fetch(`http://localhost:3000/order/${laundry.order_id}`, {
+        method: "DELETE",
+      });
 
-    // For a real backend, you would send a DELETE request
-    // and then fetch updated data using fetchLaundryData()
-    /*
-    await fetch(`http://localhost:3000/laundry/${laundry.id}`, { method: 'DELETE' });
-    fetchLaundryData();
-    */
+      if (response.ok) {
+        // Remove the deleted item from the frontend state
+        setMyData(myData.filter((item) => item.order_id !== laundry.order_id));
+      } else {
+        console.error("Failed to delete order:", response.status);
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+    }
   };
 
   const handleAccordionClick = (rowId) => {
@@ -123,6 +92,13 @@ function LaundryList() {
       [rowId]: !prevState[rowId],
     }));
   };
+
+  const handleMail = (email) => {
+    fetch(`http://localhost:3000/order/sendmail/${email}`).then(json => json.data).then(
+      alert('Mail sent')
+    )
+  }
+  
 
   return (
     <div className="  p-4 border border-gray-300 bg-white rounded shadow h-full">
@@ -134,12 +110,12 @@ function LaundryList() {
           className="text-sm active:outline-none border border-gray-300 p-2 rounded-lg mb-2 md:mb-0"
         />
       </div>
-     
+
       <div className="overflow-x-auto">
         <table className="w-full mt-4">
           <thead>
             <tr>
-              <th className="p-2 text-left">User Name</th>
+              <th className="p-2 text-left">Username</th>
               <th className="p-2 text-left">Email</th>
               <th className="p-2 text-left">Order ID</th>
               <th className="p-2 text-left">Status</th>
@@ -148,11 +124,11 @@ function LaundryList() {
           </thead>
           <tbody>
             {myData.map((laundry, index) => (
-              <React.Fragment key={laundry.id}>
+              <React.Fragment key={laundry.order_id}>
                 <tr className={index % 2 === 0 ? "bg-gray-200" : "bg-gray-100"}>
-                  <td className="p-2">{laundry.userName}</td>
+                  <td className="p-2">{laundry.username}</td>
                   <td className="p-2">{laundry.email}</td>
-                  <td className="p-2">{laundry.orderId}</td>
+                  <td className="p-2">{laundry.order_id}</td>
                   <td className="p-2">
                     <select
                       id="status"
@@ -161,16 +137,18 @@ function LaundryList() {
                       className="p-2 bg-blue-200 rounded-lg"
                     >
                       <option value="REQUESTED">REQUESTED</option>
-                      <option value="TAKEN">TAKEN</option>
+                      <option value="TAKEN">GIVEN</option>
                       <option value="PROCESS">PROCESS</option>
                       <option value="DONE">DONE</option>
                     </select>
                   </td>
                   <td className="p-2">
                     <div className="flex justify-end gap-2">
-                    {
-                        laundry.status == "DONE" ? <button className="bg-blue-500 px-2 py-1 rounded-md">Email</button> : <></>
-                      }
+                      {laundry.status === "DONE" ? (
+                        <button onClick={() => handleMail(laundry.email)} className="bg-blue-500 px-2 py-1 rounded-md">Email</button>
+                      ) : (
+                        <></>
+                      )}
                       <div
                         onClick={() => handleDelete(laundry)}
                         className="cursor-pointer text-red-700"
@@ -190,10 +168,10 @@ function LaundryList() {
                           />
                         </svg>
                       </div>
-                      
+
                       <div
                         className="cursor-pointer"
-                        onClick={() => handleAccordionClick(laundry.id)}
+                        onClick={() => handleAccordionClick(laundry.order_id)}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +189,7 @@ function LaundryList() {
                     </div>
                   </td>
                 </tr>
-                {openAccordion[laundry.id] && (
+                {openAccordion[laundry.order_id] && (
                   <tr>
                     <td colSpan="5">
                       <div

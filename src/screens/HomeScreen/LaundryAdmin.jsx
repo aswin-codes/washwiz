@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import LaundryList from "./Components/LaundryList";
 import LaundryDialog from "./Components/LaundryAddition";
+import { useNavigate } from "react-router-dom";
 
 function AdminScreen() {
+  const navigate = useNavigate()
   const [laundries, setLaundries] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,6 +20,11 @@ function AdminScreen() {
       setLoading(false);
     }, 2000);
   }, []);
+  const handleLogout = () => {
+    localStorage.clear();
+    localStorage.setItem("isLoggedIn", false);
+    navigate('/login');
+  };
 
   return (
     <div className=" min-h-screen bg-gray-200">
@@ -25,7 +32,9 @@ function AdminScreen() {
         <div className="container mx-auto text-white font-semibold text-xl flex justify-between items-center">
           <div className="flex flex-col items-start sm:flex-row w-full sm:items-center justify-between">
             <span className="mr-4">Wazhine</span>
-            
+            <button onClick={handleLogout} className="bg-blue-700 px-2 py-1 text-md font-normal rounded-md">
+              Logout
+            </button>
           </div>
         </div>
       </header>

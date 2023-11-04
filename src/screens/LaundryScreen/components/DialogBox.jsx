@@ -35,54 +35,52 @@ const pricingData = [
   // Add more pricing information for other clothing types as needed
 ];
 
-const LaundryDialog = ({ isOpen, onClose, onAddLaundry }) => {
+const LaundryDialog = ({ isOpen, onClose, shop_id,onAddLaundry }) => {
   const [status, setStatus] = useState('REQUESTED');
   const [clothes, setClothes] = useState([{ type: '', service: 'washing', count: 0 }]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Prepare the laundry data to send to the server
+    const email = localStorage.getItem('email')
+    const username = localStorage.getItem('username')
+    const user_id = localStorage.getItem('user_id')
     const laundryData = {
       status,
-      clothes: clothes.map((clothing) => ({
-        type: clothing.type,
-        service: clothing.service,
-        count: clothing.count,
-      })),
-      totalCost: calculateTotalCost(),
+      shop_id: shop_id, // Replace with the actual shop ID
+      clothes,
+      email,
+      username,
+      user_id, // Include the user ID if available
     };
   
-    // Log the JSON data that needs to be sent to the server
-    console.log('JSON data to be sent to the server:', JSON.stringify(laundryData));
+    try {
+      const response = await fetch('http://localhost:3000/order/addorder/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(laundryData),
+      });
   
-    // You can send the `laundryData` to the server using an HTTP request here
-    // Example: You can use the Fetch API or an HTTP library like Axios to send the data
-    // Replace the following comment with your actual server request code.
+      if (response.ok) {
+        // Order was successfully added
+        // You can handle the response here as needed
+        const data = await response.json();
+        console.log('Order ID:', data.order_id);
   
-    // fetch('your-server-endpoint', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(laundryData),
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log('Server response:', data);
-    //     // Handle the server response here
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error sending data to the server:', error);
-    //     // Handle the error here
-    //   });
-  
-    // Reset the form fields (you can add this part)
-    setStatus('REQUESTED');
-    setClothes([{ type: '', service: 'washing', count: 0 }]);
-  
-    onClose();
-    //onAddLaundry();
+        // Reset form fields and close the dialog
+        setStatus('REQUESTED');
+        setClothes([{ type: '', service: 'washing', count: 0 }]);
+        onClose();
+        // You may want to trigger any additional actions (e.g., update order list) here
+      } else {
+        // Handle the case where the server returns an error response
+        console.error('Error adding order:', response.status);
+      }
+    } catch (error) {
+      console.error('Error sending data to the server:', error);
+    }
   };
   
 
@@ -191,9 +189,9 @@ const LaundryDialog = ({ isOpen, onClose, onAddLaundry }) => {
                   Add Clothing
                 </button>
               </div>
-              <div className="mt-4">
+              {/* <div className="mt-4">
                 <label className="block text-gray-700 text-sm font-bold">Total Cost: ${calculateTotalCost()}</label>
-              </div>
+              </div> */}
             </form>
           </div>
           <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
